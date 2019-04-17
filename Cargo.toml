@@ -20,7 +20,7 @@ travis-ci = { repository = "rust-random/rand" }
 appveyor = { repository = "rust-random/rand" }
 
 [features]
-default = ["std"] # without "std" rand uses libcore
+default = ["std", "mesalock_sgx"] # without "std" rand uses libcore
 nightly = ["simd_support"] # enables all features requiring nightly rust
 std = ["rand_core/std", "alloc", "getrandom"]
 alloc = ["rand_core/alloc"]  # enables Vec and Box support (without std)
@@ -30,6 +30,7 @@ serde1 = ["rand_core/serde1", "rand_isaac/serde1", "rand_xorshift/serde1"] # ena
 # re-export optional WASM dependencies to avoid breakage:
 wasm-bindgen = ["getrandom/wasm-bindgen"]
 stdweb = ["getrandom/stdweb"]
+mesalock_sgx = ["sgx_tstd"]
 
 [workspace]
 members = [
@@ -50,8 +51,9 @@ members = [
 rand_core = { path = "rand_core", version = "0.4" }
 rand_pcg = { path = "rand_pcg", version = "0.1" }
 rand_hc = { path = "rand_hc", version = "0.1" }
-getrandom = { version = "0.1.1", optional = true }
-log = { version = "0.4", optional = true }
+getrandom = { git = "https://github.com/mesalock-linux/getrandom-sgx.git", optional = true }
+log = { git = "https://github.com/mesalock-linux/log-sgx.git", optional = true }
+sgx_tstd = { version = "1.0", optional = true }
 
 [dependencies.packed_simd]
 # NOTE: so far no version works reliably due to dependence on unstable features
@@ -60,9 +62,9 @@ version = "0.3"
 optional = true
 features = ["into_bits"]
 
-[target.'cfg(unix)'.dependencies]
-# Used for fork protection (reseeding.rs)
-libc = { version = "0.2", default-features = false }
+#[target.'cfg(unix)'.dependencies]
+## Used for fork protection (reseeding.rs)
+#libc = { version = "0.2", default-features = false }
 
 [dev-dependencies]
 # This has a histogram implementation used for testing uniformity.

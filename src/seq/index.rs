@@ -10,6 +10,8 @@
 
 #[cfg(feature="alloc")] use core::slice;
 
+#[cfg(feature="mesalock_sgx")] use std::prelude::v1::*;
+
 #[cfg(feature="std")] use std::vec;
 #[cfg(all(feature="alloc", not(feature="std")))] use alloc::vec::{self, Vec};
 // BTreeMap is not as fast in tests, but better than nothing.

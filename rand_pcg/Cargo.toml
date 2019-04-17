@@ -23,8 +23,8 @@ serde1 = ["serde", "serde_derive"]
 
 [dependencies]
 rand_core = { path = "../rand_core", version = "0.4" }
-serde = { version = "1", optional = true }
-serde_derive = { version = "^1.0.38", optional = true }
+serde = { git="https://github.com/mesalock-linux/serde-sgx.git", optional = true }
+serde_derive = { git="https://github.com/mesalock-linux/serde-sgx.git", optional = true }
 
 [dev-dependencies]
 # This is for testing serde, unfortunately we can't specify feature-gated dev

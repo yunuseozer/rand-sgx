@@ -14,6 +14,8 @@ use core::fmt;
 use std::error::Error as stdError;
 #[cfg(feature="std")]
 use std::io;
+#[cfg(all(feature="std", feature="mesalock_sgx", not(target_env="sgx")))]
+use std::prelude::v1::*;
 
 /// Error kind which can be matched over.
 #[derive(PartialEq, Eq, Debug, Copy, Clone)]

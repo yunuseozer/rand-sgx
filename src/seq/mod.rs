@@ -15,6 +15,7 @@
 
 #[cfg(feature="alloc")] use core::ops::Index;
 
+#[cfg(feature="mesalock_sgx")] use std::prelude::v1::*;
 #[cfg(all(feature="alloc", not(feature="std")))] use alloc::vec::Vec;
 
 use Rng;

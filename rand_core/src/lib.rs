@@ -35,10 +35,20 @@
 #![deny(missing_debug_implementations)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
 
-#![cfg_attr(not(feature="std"), no_std)]
 #![cfg_attr(all(feature="alloc", not(feature="std")), feature(alloc))]
+#![cfg_attr(any(not(feature = "std"),
+                all(feature = "mesalock_sgx", not(target_env = "sgx"))),
+            no_std)]
+#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
 
-#[cfg(feature="std")] extern crate core;
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+#[macro_use]
+extern crate sgx_tstd as std;
+
+#[cfg(all(feature="mesalock_sgx", not(target_env="sgx")))]
+use std::prelude::v1::*;
+
+#[cfg(all(feature="std", not(feature="mesalock_sgx")))] extern crate core;
 #[cfg(all(feature = "alloc", not(feature="std")))] extern crate alloc;
 #[cfg(feature="serde1")] extern crate serde;
 #[cfg(feature="serde1")] #[macro_use] extern crate serde_derive;

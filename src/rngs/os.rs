@@ -60,8 +60,8 @@ impl RngCore for OsRng {
     }
 
     fn try_fill_bytes(&mut self, dest: &mut [u8]) -> Result<(), Error> {
-        getrandom(dest).map_err(|e|
-            Error::with_cause(ErrorKind::Unavailable, "OsRng failed", e))
+        getrandom(dest).map_err(|_|
+            Error::new(ErrorKind::Unavailable, "OsRng failed"))
     }
 }
 

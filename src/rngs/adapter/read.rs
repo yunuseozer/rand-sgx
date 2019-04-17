@@ -75,11 +75,11 @@ impl<R: Read> RngCore for ReadRng<R> {
         // Use `std::io::read_exact`, which retries on `ErrorKind::Interrupted`.
         self.reader.read_exact(dest).map_err(|err| {
             match err.kind() {
-                ::std::io::ErrorKind::UnexpectedEof => Error::with_cause(
+                ::std::io::ErrorKind::UnexpectedEof => Error::new(
                     ErrorKind::Unavailable,
-                    "not enough bytes available, reached end of source", err),
-                _ => Error::with_cause(ErrorKind::Unavailable,
-                    "error reading from Read source", err)
+                    "not enough bytes available, reached end of source"),
+                _ => Error::new(ErrorKind::Unavailable,
+                    "error reading from Read source")
             }
         })
     }

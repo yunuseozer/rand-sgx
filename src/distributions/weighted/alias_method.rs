@@ -1,6 +1,7 @@
 //! This module contains an implementation of alias method for sampling random
 //! indices with probabilities proportional to a collection of weights.
 
+#[cfg(feature="mesalock_sgx")] use std::prelude::v1::*;
 use super::WeightedError;
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;

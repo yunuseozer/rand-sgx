@@ -49,11 +49,19 @@
 #![deny(missing_debug_implementations)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
 
-#![cfg_attr(not(feature="std"), no_std)]
+#![cfg_attr(any(not(feature="std"),
+            all(feature = "mesalock_sgx", not(target_env = "sgx"))),
+             no_std)]
 #![cfg_attr(all(feature="alloc", not(feature="std")), feature(alloc))]
 #![cfg_attr(all(feature="simd_support", feature="nightly"), feature(stdsimd))]
 
-#[cfg(feature = "std")] extern crate core;
+#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
+
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+#[macro_use]
+extern crate sgx_tstd as std;
+
+#[cfg(all(not(feature = "mesalock_sgx"), feature = "std"))] extern crate core;
 #[cfg(all(feature = "alloc", not(feature="std")))] #[macro_use] extern crate alloc;
 
 #[cfg(feature="simd_support")] extern crate packed_simd;
