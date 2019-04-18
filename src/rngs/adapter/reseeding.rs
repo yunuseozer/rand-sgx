@@ -279,9 +279,8 @@ where R: BlockRngCore + SeedableRng + CryptoRng,
       Rsdr: RngCore + CryptoRng {}
 
 
-#[cfg(all(unix, not(target_os="emscripten")))]
+#[cfg(all(unix, not(target_os="emscripten"),not(feature="mesalock_sgx")))]
 mod fork {
-    #[cfg(not(feature="mesalock_sgx"))]
     extern crate libc;
 
     use core::sync::atomic::{AtomicUsize, AtomicBool, Ordering};
@@ -310,7 +309,6 @@ mod fork {
     #[allow(deprecated)]
     static FORK_HANDLER_REGISTERED: AtomicBool = ATOMIC_BOOL_INIT;
 
-    #[cfg(not(feature="mesalock_sgx"))]
     extern fn fork_handler() {
         // Note: fetch_add is defined to wrap on overflow
         // (which is what we want).
@@ -319,14 +317,13 @@ mod fork {
 
     pub fn register_fork_handler() {
         if FORK_HANDLER_REGISTERED.load(Ordering::Relaxed) == false {
-            #[cfg(not(feature="mesalock_sgx"))]
             unsafe { libc::pthread_atfork(None, None, Some(fork_handler)) };
             FORK_HANDLER_REGISTERED.store(true, Ordering::Relaxed);
         }
     }
 }
 
-#[cfg(not(all(unix, not(target_os="emscripten"))))]
+#[cfg(not(all(unix, not(target_os="emscripten"), not(feature="mesalock_sgx"))))]
 mod fork {
     pub fn get_fork_counter() -> usize { 0 }
     pub fn register_fork_handler() {}
