@@ -142,6 +142,7 @@ mod test {
     use super::*;
 
     #[test]
+    #[cfg(not(miri))] // Miri is too slow
     fn test_weightedindex() {
         let mut r = ::test::rng(700);
         const N_REPS: u32 = 5000;

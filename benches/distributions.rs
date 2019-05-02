@@ -20,8 +20,7 @@ use std::num::{NonZeroU8, NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU128};
 use test::Bencher;
 use std::time::Duration;
 
-use rand::{Rng, FromEntropy};
-use rand::rngs::SmallRng;
+use rand::prelude::*;
 use rand_distr::{*, weighted::WeightedIndex};
 
 macro_rules! distr_int {
@@ -197,18 +196,19 @@ distr_float!(distr_openclosed01_f32, f32, OpenClosed01);
 distr_float!(distr_openclosed01_f64, f64, OpenClosed01);
 
 // distributions
-distr_float!(distr_exp, f64, Exp::new(1.23 * 4.56));
-distr_float!(distr_normal, f64, Normal::new(-1.23, 4.56));
-distr_float!(distr_log_normal, f64, LogNormal::new(-1.23, 4.56));
-distr_float!(distr_gamma_large_shape, f64, Gamma::new(10., 1.0));
-distr_float!(distr_gamma_small_shape, f64, Gamma::new(0.1, 1.0));
-distr_float!(distr_cauchy, f64, Cauchy::new(4.2, 6.9));
-distr_int!(distr_binomial, u64, Binomial::new(20, 0.7));
-distr_int!(distr_binomial_small, u64, Binomial::new(1000000, 1e-30));
-distr_int!(distr_poisson, u64, Poisson::new(4.0));
+distr_float!(distr_exp, f64, Exp::new(1.23 * 4.56).unwrap());
+distr_float!(distr_normal, f64, Normal::new(-1.23, 4.56).unwrap());
+distr_float!(distr_log_normal, f64, LogNormal::new(-1.23, 4.56).unwrap());
+distr_float!(distr_gamma_large_shape, f64, Gamma::new(10., 1.0).unwrap());
+distr_float!(distr_gamma_small_shape, f64, Gamma::new(0.1, 1.0).unwrap());
+distr_float!(distr_cauchy, f64, Cauchy::new(4.2, 6.9).unwrap());
+distr_float!(distr_triangular, f64, Triangular::new(0., 1., 0.9).unwrap());
+distr_int!(distr_binomial, u64, Binomial::new(20, 0.7).unwrap());
+distr_int!(distr_binomial_small, u64, Binomial::new(1000000, 1e-30).unwrap());
+distr_int!(distr_poisson, u64, Poisson::new(4.0).unwrap());
 distr!(distr_bernoulli, bool, Bernoulli::new(0.18));
-distr_arr!(distr_circle, [f64; 2], UnitCircle::new());
-distr_arr!(distr_sphere_surface, [f64; 3], UnitSphereSurface::new());
+distr_arr!(distr_circle, [f64; 2], UnitCircle);
+distr_arr!(distr_sphere_surface, [f64; 3], UnitSphereSurface);
 
 // Weighted
 distr_int!(distr_weighted_i8, usize, WeightedIndex::new(&[1i8, 2, 3, 4, 12, 0, 2, 1]).unwrap());
@@ -279,7 +279,7 @@ gen_range_float!(gen_range_f64, f64, 123.456f64, 7890.12);
 #[bench]
 fn dist_iter(b: &mut Bencher) {
     let mut rng = SmallRng::from_entropy();
-    let distr = Normal::new(-2.71828, 3.14159);
+    let distr = Normal::new(-2.71828, 3.14159).unwrap();
     let mut iter = distr.sample_iter(&mut rng);
 
     b.iter(|| {
@@ -291,3 +291,23 @@ fn dist_iter(b: &mut Bencher) {
     });
     b.bytes = size_of::<f64>() as u64 * ::RAND_BENCH_N;
 }
+
+macro_rules! sample_binomial {
+    ($name:ident, $n:expr, $p:expr) => {
+        #[bench]
+        fn $name(b: &mut Bencher) {
+            let mut rng = SmallRng::from_rng(&mut thread_rng()).unwrap();
+            let (n, p) = ($n, $p);
+            b.iter(|| {
+                let d = Binomial::new(n, p).unwrap();
+                rng.sample(d)
+            })
+        }
+    }
+}
+
+sample_binomial!(misc_binomial_1, 1, 0.9);
+sample_binomial!(misc_binomial_10, 10, 0.9);
+sample_binomial!(misc_binomial_100, 100, 0.99);
+sample_binomial!(misc_binomial_1000, 1000, 0.01);
+sample_binomial!(misc_binomial_1e12, 1000_000_000_000, 0.2);

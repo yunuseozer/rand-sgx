@@ -51,7 +51,7 @@
 //! [`fill_bytes`]: RngCore::fill_bytes
 
 use core::convert::AsRef;
-use core::fmt;
+use core::{fmt, ptr};
 use {RngCore, CryptoRng, SeedableRng, Error};
 use impls::{fill_via_u32_chunks, fill_via_u64_chunks};
 
@@ -181,9 +181,10 @@ where <R as BlockRngCore>::Results: AsRef<[u32]> + AsMut<[u32]>
     #[inline(always)]
     fn next_u64(&mut self) -> u64 {
         let read_u64 = |results: &[u32], index| {
-            if cfg!(any(target_arch = "x86", target_arch = "x86_64")) {
-                // requires little-endian CPU supporting unaligned reads:
-                unsafe { *(&results[index] as *const u32 as *const u64) }
+            if cfg!(any(target_endian = "little")) {
+                // requires little-endian CPU
+                let ptr: *const u64 = results[index..=index+1].as_ptr() as *const u64;
+                unsafe { ptr::read_unaligned(ptr) }
             } else {
                 let x = u64::from(results[index]);
                 let y = u64::from(results[index + 1]);
@@ -209,48 +210,6 @@ where <R as BlockRngCore>::Results: AsRef<[u32]> + AsMut<[u32]>
         }
     }
 
-    // As an optimization we try to write directly into the output buffer.
-    // This is only enabled for little-endian platforms where unaligned writes
-    // are known to be safe and fast.
-    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-    fn fill_bytes(&mut self, dest: &mut [u8]) {
-        let mut filled = 0;
-
-        // Continue filling from the current set of results
-        if self.index < self.results.as_ref().len() {
-            let (consumed_u32, filled_u8) =
-                fill_via_u32_chunks(&self.results.as_ref()[self.index..],
-                                    dest);
-
-            self.index += consumed_u32;
-            filled += filled_u8;
-        }
-
-        let len_remainder =
-            (dest.len() - filled) % (self.results.as_ref().len() * 4);
-        let end_direct = dest.len() - len_remainder;
-
-        while filled < end_direct {
-            let dest_u32: &mut R::Results = unsafe {
-                &mut *(dest[filled..].as_mut_ptr() as
-                *mut <R as BlockRngCore>::Results)
-            };
-            self.core.generate(dest_u32);
-            filled += self.results.as_ref().len() * 4;
-            self.index = self.results.as_ref().len();
-        }
-
-        if len_remainder > 0 {
-            self.core.generate(&mut self.results);
-            let (consumed_u32, _) =
-                fill_via_u32_chunks(self.results.as_ref(),
-                                    &mut dest[filled..]);
-
-            self.index = consumed_u32;
-        }
-    }
-
-    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         let mut read_len = 0;
         while read_len < dest.len() {
@@ -415,48 +374,6 @@ where <R as BlockRngCore>::Results: AsRef<[u64]> + AsMut<[u64]>
         value
     }
 
-    // As an optimization we try to write directly into the output buffer.
-    // This is only enabled for little-endian platforms where unaligned writes
-    // are known to be safe and fast.
-    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-    fn fill_bytes(&mut self, dest: &mut [u8]) {
-        let mut filled = 0;
-        self.half_used = false;
-
-        // Continue filling from the current set of results
-        if self.index < self.results.as_ref().len() {
-            let (consumed_u64, filled_u8) =
-                fill_via_u64_chunks(&self.results.as_ref()[self.index..],
-                                    dest);
-
-            self.index += consumed_u64;
-            filled += filled_u8;
-        }
-
-        let len_remainder =
-            (dest.len() - filled) % (self.results.as_ref().len() * 8);
-        let end_direct = dest.len() - len_remainder;
-
-        while filled < end_direct {
-            let dest_u64: &mut R::Results = unsafe {
-                ::core::mem::transmute(dest[filled..].as_mut_ptr())
-            };
-            self.core.generate(dest_u64);
-            filled += self.results.as_ref().len() * 8;
-            self.index = self.results.as_ref().len();
-        }
-
-        if len_remainder > 0 {
-            self.core.generate(&mut self.results);
-            let (consumed_u64, _) =
-                fill_via_u64_chunks(&mut self.results.as_ref(),
-                                    &mut dest[filled..]);
-
-            self.index = consumed_u64;
-        }
-    }
-
-    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         let mut read_len = 0;
         self.half_used = false;
