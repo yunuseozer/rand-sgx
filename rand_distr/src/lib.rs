@@ -70,17 +70,18 @@ pub use rand::distributions::{Distribution, DistIter, Standard,
 
 pub use self::unit_sphere::UnitSphereSurface;
 pub use self::unit_circle::UnitCircle;
-pub use self::gamma::{Gamma, ChiSquared, FisherF,
-    StudentT, Beta};
-pub use self::normal::{Normal, LogNormal, StandardNormal};
-pub use self::exponential::{Exp, Exp1};
-pub use self::pareto::Pareto;
-pub use self::poisson::Poisson;
-pub use self::binomial::Binomial;
-pub use self::cauchy::Cauchy;
-pub use self::dirichlet::Dirichlet;
-pub use self::triangular::Triangular;
-pub use self::weibull::Weibull;
+pub use self::gamma::{Gamma, Error as GammaError, ChiSquared, ChiSquaredError,
+    FisherF, FisherFError, StudentT, Beta, BetaError};
+pub use self::normal::{Normal, Error as NormalError, LogNormal, StandardNormal};
+pub use self::exponential::{Exp, Error as ExpError, Exp1};
+pub use self::pareto::{Pareto, Error as ParetoError};
+pub use self::pert::{Pert, PertError};
+pub use self::poisson::{Poisson, Error as PoissonError};
+pub use self::binomial::{Binomial, Error as BinomialError};
+pub use self::cauchy::{Cauchy, Error as CauchyError};
+pub use self::dirichlet::{Dirichlet, Error as DirichletError};
+pub use self::triangular::{Triangular, TriangularError};
+pub use self::weibull::{Weibull, Error as WeibullError};
 
 mod unit_sphere;
 mod unit_circle;
@@ -88,6 +89,7 @@ mod gamma;
 mod normal;
 mod exponential;
 mod pareto;
+mod pert;
 mod poisson;
 mod binomial;
 mod cauchy;
@@ -99,8 +101,29 @@ mod ziggurat_tables;
 
 #[cfg(test)]
 mod test {
+    // Notes on testing
+    // 
+    // Testing random number distributions correctly is hard. The following
+    // testing is desired:
+    // 
+    // - Construction: test initialisation with a few valid parameter sets.
+    // - Erroneous usage: test that incorrect usage generates an error.
+    // - Vector: test that usage with fixed inputs (including RNG) generates a
+    //   fixed output sequence on all platforms.
+    // - Correctness at fixed points (optional): using a specific mock RNG,
+    //   check that specific values are sampled (e.g. end-points and median of
+    //   distribution).
+    // - Correctness of PDF (extra): generate a histogram of samples within a
+    //   certain range, and check this approximates the PDF. These tests are
+    //   expected to be expensive, and should be behind a feature-gate.
+    //
+    // TODO: Vector and correctness tests are largely absent so far.
+    // NOTE: Some distributions have tests checking only that samples can be
+    // generated. This is redundant with vector and correctness tests.
+
     use rand::{RngCore, SeedableRng, rngs::StdRng};
 
+    /// Construct a deterministic RNG with the given seed
     pub fn rng(seed: u64) -> impl RngCore {
         StdRng::seed_from_u64(seed)
     }

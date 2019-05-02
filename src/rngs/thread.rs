@@ -67,7 +67,7 @@ const THREAD_RNG_RESEED_THRESHOLD: u64 = 32*1024*1024; // 32 MiB
 /// [`ReseedingRng`]: crate::rngs::adapter::ReseedingRng
 /// [`StdRng`]: crate::rngs::StdRng
 /// [HC-128]: rand_hc::Hc128Rng
-#[derive(Clone, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct ThreadRng {
     // use of raw pointer implies type is neither Send nor Sync
     rng: *mut ReseedingRng<Hc128Core, OsRng>,
@@ -88,7 +88,7 @@ thread_local!(
 /// seeded by the system. Intended to be used in method chaining style,
 /// e.g. `thread_rng().gen::<i32>()`, or cached locally, e.g.
 /// `let mut rng = thread_rng();`.  Invoked by the `Default` trait, making
-/// `ThreadRng::default()` equivelent.
+/// `ThreadRng::default()` equivalent.
 ///
 /// For more information see [`ThreadRng`].
 pub fn thread_rng() -> ThreadRng {
