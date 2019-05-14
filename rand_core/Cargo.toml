@@ -26,4 +26,4 @@ mesalock_sgx = ["alloc", "sgx_tstd"]
 [dependencies]
 serde = { git = "https://github.com/mesalock-linux/serde-sgx.git", optional = true }
 serde_derive = { git = "https://github.com/mesalock-linux/serde-sgx.git", optional = true }
-sgx_tstd = { version = "1.0", optional = true }
+sgx_tstd = { git = "https://github.com/baidu/rust-sgx-sdk.git", optional = true }
