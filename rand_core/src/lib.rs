@@ -48,7 +48,9 @@ extern crate sgx_tstd as std;
 #[cfg(all(feature="mesalock_sgx", not(target_env="sgx")))]
 use std::prelude::v1::*;
 
-#[cfg(all(feature="std", not(feature="mesalock_sgx")))] extern crate core;
+#[cfg(any(all(feature="std", not(feature="mesalock_sgx")),
+          target_env = "sgx"))]
+extern crate core;
 #[cfg(all(feature = "alloc", not(feature="std")))] extern crate alloc;
 #[cfg(feature="serde1")] extern crate serde;
 #[cfg(feature="serde1")] #[macro_use] extern crate serde_derive;
