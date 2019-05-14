@@ -61,7 +61,10 @@
 #[macro_use]
 extern crate sgx_tstd as std;
 
-#[cfg(all(not(feature = "mesalock_sgx"), feature = "std"))] extern crate core;
+#[cfg(any(all(feature="std", not(feature="mesalock_sgx")),
+          target_env = "sgx"))]
+extern crate core;
+
 #[cfg(all(feature = "alloc", not(feature="std")))] #[macro_use] extern crate alloc;
 
 #[cfg(feature="simd_support")] extern crate packed_simd;
