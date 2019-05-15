@@ -25,4 +25,3 @@ mesalock_sgx = ["sgx_tstd"]
 [dependencies]
 rand = { path = "..", version = ">=0.5, <=0.7" }
 sgx_tstd = { version = "1.0", git = "https://github.com/baidu/rust-sgx-sdk.git", optional = true }
-num-traits = { git = "https://github.com/mesalock-linux/num-traits-sgx" }
