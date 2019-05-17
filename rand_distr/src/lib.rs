@@ -55,8 +55,10 @@
 //!   - [`Triangular`] distribution
 //! - Multivariate probability distributions
 //!   - [`Dirichlet`] distribution
-//!   - [`UnitSphereSurface`] distribution
+//!   - [`UnitSphere`] distribution
+//!   - [`UnitBall`] distribution
 //!   - [`UnitCircle`] distribution
+//!   - [`UnitDisc`] distribution
 
 #![cfg_attr(all(feature = "mesalock_sgx", not(target_env = "sgx")), no_std)]
 #![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
@@ -68,8 +70,10 @@ extern crate sgx_tstd as std;
 pub use rand::distributions::{Distribution, DistIter, Standard,
     Alphanumeric, Uniform, OpenClosed01, Open01, Bernoulli, uniform, weighted};
 
-pub use self::unit_sphere::UnitSphereSurface;
+pub use self::unit_sphere::UnitSphere;
+pub use self::unit_ball::UnitBall;
 pub use self::unit_circle::UnitCircle;
+pub use self::unit_disc::UnitDisc;
 pub use self::gamma::{Gamma, Error as GammaError, ChiSquared, ChiSquaredError,
     FisherF, FisherFError, StudentT, Beta, BetaError};
 pub use self::normal::{Normal, Error as NormalError, LogNormal, StandardNormal};
@@ -85,7 +89,9 @@ pub use self::weibull::{Weibull, Error as WeibullError};
 pub use self::utils::Float;
 
 mod unit_sphere;
+mod unit_ball;
 mod unit_circle;
+mod unit_disc;
 mod gamma;
 mod normal;
 mod exponential;
