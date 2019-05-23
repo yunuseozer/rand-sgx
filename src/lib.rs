@@ -336,7 +336,7 @@ pub trait Rng: RngCore {
     /// [`Bernoulli`]: distributions::bernoulli::Bernoulli
     #[inline]
     fn gen_bool(&mut self, p: f64) -> bool {
-        let d = distributions::Bernoulli::new(p);
+        let d = distributions::Bernoulli::new(p).unwrap();
         self.sample(d)
     }
 
@@ -365,7 +365,7 @@ pub trait Rng: RngCore {
     /// [`Bernoulli`]: distributions::bernoulli::Bernoulli
     #[inline]
     fn gen_ratio(&mut self, numerator: u32, denominator: u32) -> bool {
-        let d = distributions::Bernoulli::from_ratio(numerator, denominator);
+        let d = distributions::Bernoulli::from_ratio(numerator, denominator).unwrap();
         self.sample(d)
     }
 }
