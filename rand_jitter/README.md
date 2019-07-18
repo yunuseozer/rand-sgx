@@ -9,6 +9,10 @@
 
 Non-physical true random number generator based on timing jitter.
 
+Note that this RNG is not suited for use cases where cryptographic security is
+required (also see [this
+discussion](https://github.com/rust-random/rand/issues/699)).
+
 This crate depends on [rand_core](https://crates.io/crates/rand_core) and is
 part of the [Rand project](https://github.com/rust-random/rand).
 
@@ -20,7 +24,7 @@ Links:
 
 -   [API documentation (master)](https://rust-random.github.io/rand/rand_jitter)
 -   [API documentation (docs.rs)](https://docs.rs/rand_jitter)
--   [Changelog](CHANGELOG.md)
+-   [Changelog](https://github.com/rust-random/rand/blob/master/rand_jitter/CHANGELOG.md)
 
 ## Features
 
@@ -38,15 +42,26 @@ recommend to run the much more stringent
 
 Use the following code using `timer_stats` to collect the data:
 
-```rust
+```rust,no_run
 use rand_jitter::JitterRng;
 
 use std::error::Error;
 use std::fs::File;
 use std::io::Write;
 
-fn main() -> Result<(), Box<Error>> {
-    let mut rng = JitterRng::new()?;
+fn get_nstime() -> u64 {
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    let dur = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+    // The correct way to calculate the current time is
+    // `dur.as_secs() * 1_000_000_000 + dur.subsec_nanos() as u64`
+    // But this is faster, and the difference in terms of entropy is
+    // negligible (log2(10^9) == 29.9).
+    dur.as_secs() << 30 | dur.subsec_nanos() as u64
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut rng = JitterRng::new_with_timer(get_nstime);
 
     // 1_000_000 results are required for the
     // NIST SP 800-90B Entropy Estimation Suite

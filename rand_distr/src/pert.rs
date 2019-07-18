@@ -13,9 +13,9 @@ use crate::utils::Float;
 
 /// The PERT distribution.
 ///
-/// Similar to the [Triangular] distribution, the PERT distribution is
+/// Similar to the [`Triangular`] distribution, the PERT distribution is
 /// parameterised by a range and a mode within that range. Unlike the
-/// [Triangular] distribution, the probability density function of the PERT
+/// [`Triangular`] distribution, the probability density function of the PERT
 /// distribution is smooth, with a configurable weighting around the mode.
 ///
 /// # Example
@@ -27,6 +27,8 @@ use crate::utils::Float;
 /// let v = d.sample(&mut rand::thread_rng());
 /// println!("{} is from a PERT distribution", v);
 /// ```
+/// 
+/// [`Triangular`]: crate::Triangular
 #[derive(Clone, Copy, Debug)]
 pub struct Pert<N> {
     min: N,
@@ -118,13 +120,13 @@ mod test {
     }
     
     #[test]
-    fn test_pert_vector() {
+    fn value_stability() {
         let rng = crate::test::rng(860);
         let distr = Pert::new(2., 10., 3.).unwrap();    // mean = 4, var = 12/7
         let seq = distr.sample_iter(rng).take(5).collect::<Vec<f64>>();
         println!("seq: {:?}", seq);
-        let expected = vec![3.945192480331639, 4.571769050527243,
-                7.419819712922435, 4.049743197259167, 5.825644880531534];
+        let expected = vec![4.631484136029422, 3.307201472321789,
+                3.29995019556348, 3.66835483991721, 3.514246139933899];
         assert!(seq == expected);
     }
 }

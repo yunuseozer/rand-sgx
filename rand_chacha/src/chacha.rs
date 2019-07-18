@@ -8,13 +8,15 @@
 
 //! The ChaCha random number generator.
 
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", feature = "mesalock_sgx", target_env = "sgx"))]
 use std as core;
-#[cfg(not(feature = "std"))]
-use core;
+//#[cfg(all(feature = "std", feature = "mesalock_sgx", not(target_env = "sgx")))]
+//use std as core;
+//#[cfg(not(feature = "std"))]
+//use core;
 
 use c2_chacha::guts::ChaCha;
-use self::core::fmt;
+use core::fmt;
 use rand_core::block::{BlockRng, BlockRngCore};
 use rand_core::{CryptoRng, Error, RngCore, SeedableRng};
 
@@ -114,7 +116,7 @@ macro_rules! chacha_impl {
         /// except that we use a stream identifier in place of a nonce. A 64-bit counter over 64-byte
         /// (16 word) blocks allows 1 ZiB of output before cycling, and the stream identifier allows
         /// 2<sup>64</sup> unique streams of output per seed. Both counter and stream are initialized
-        /// to zero but may be set via [`set_word_pos`] and [`set_stream`].
+        /// to zero but may be set via the `set_word_pos` and `set_stream` methods.
         ///
         /// The word layout is:
         ///
@@ -133,9 +135,6 @@ macro_rules! chacha_impl {
         ///
         /// [^2]: [eSTREAM: the ECRYPT Stream Cipher Project](
         ///       http://www.ecrypt.eu.org/stream/)
-        ///
-        /// [`set_word_pos`]: ChaChaXRng::set_word_pos
-        /// [`set_stream`]: ChaChaXRng::set_stream
         #[derive(Clone, Debug)]
         pub struct $ChaChaXRng {
             rng: BlockRng<$ChaChaXCore>,
