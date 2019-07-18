@@ -16,7 +16,10 @@ use std as core;
 //use core;
 
 use c2_chacha::guts::ChaCha;
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
 use core::fmt;
+#[cfg(all(feature = "mesalock_sgx", target_env = "sgx"))]
+use self::core::fmt;
 use rand_core::block::{BlockRng, BlockRngCore};
 use rand_core::{CryptoRng, Error, RngCore, SeedableRng};
 
