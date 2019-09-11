@@ -26,51 +26,25 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef	_EDL_STAT_H
-#define	_EDL_STAT_H
+#ifndef _EDL_DIRENT_H
+#define _EDL_DIRENT_H
 
-struct stat_t
+struct dirent_t
 {
-    uint64_t st_dev;
-    uint64_t st_ino;
-    uint64_t st_nlink;
-    uint32_t st_mode;
-    uint32_t st_uid;
-    uint32_t st_gid;
-    int __pad0;
-    uint64_t st_rdev;
-    uint64_t st_size;
-    int64_t st_blksize;
-    int64_t st_blocks;
-    int64_t st_atime;
-    int64_t st_atime_nsec;
-    int64_t st_mtime;
-    int64_t st_mtime_nsec;
-    int64_t st_ctime;
-    int64_t st_ctime_nsec;
-    int64_t __reserved[3];
+    uint64_t d_ino;
+    int64_t d_off;
+    unsigned short int d_reclen;
+    unsigned char d_type;
+    char d_name[256];
 };
 
-struct stat64_t 
+struct dirent64_t
 {
-    uint64_t st_dev;
-    uint64_t st_ino;
-    uint64_t st_nlink;
-    uint32_t st_mode;
-    uint32_t st_uid;
-    uint32_t st_gid;
-    int __pad0;
-    uint64_t st_rdev;
-    uint64_t st_size;
-    int64_t st_blksize;
-    int64_t st_blocks;
-    int64_t st_atime;
-    int64_t st_atime_nsec;
-    int64_t st_mtime;
-    int64_t st_mtime_nsec;
-    int64_t st_ctime;
-    int64_t st_ctime_nsec;
-    int64_t __reserved[3];
+    uint64_t d_ino;
+    int64_t d_off;
+    unsigned short int d_reclen;
+    unsigned char d_type;
+    char d_name[256];
 };
 
 #endif
