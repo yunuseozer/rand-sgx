@@ -12,7 +12,7 @@ Random number generators and other randomness functionality.
 """
 keywords = ["random", "rng"]
 categories = ["algorithms", "no-std"]
-exclude = ["/utils/*", "/.travis.yml", "/appveyor.yml", ".gitignore"]
+exclude = ["/utils/*", "/.travis.yml", "/appveyor.yml", ".gitignore", "/sgx/*"]
 autobenches = true
 edition = "2018"
 
