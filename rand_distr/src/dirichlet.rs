@@ -61,8 +61,8 @@ where StandardNormal: Distribution<N>, Exp1: Distribution<N>, Open01: Distributi
         if a.len() < 2 {
             return Err(Error::AlphaTooShort);
         }
-        for i in 0..a.len() {
-            if !(a[i] > N::from(0.0)) {
+        for &ai in &a {
+            if !(ai > N::from(0.0)) {
                 return Err(Error::AlphaTooSmall);
             }
         }
@@ -95,14 +95,14 @@ where StandardNormal: Distribution<N>, Exp1: Distribution<N>, Open01: Distributi
         let mut samples = vec![N::from(0.0); n];
         let mut sum = N::from(0.0);
 
-        for i in 0..n {
-            let g = Gamma::new(self.alpha[i], N::from(1.0)).unwrap();
-            samples[i] = g.sample(rng);
-            sum += samples[i];
+        for (s, &a) in samples.iter_mut().zip(self.alpha.iter()) {
+            let g = Gamma::new(a, N::from(1.0)).unwrap();
+            *s = g.sample(rng);
+            sum += *s;
         }
         let invacc = N::from(1.0) / sum;
-        for i in 0..n {
-            samples[i] *= invacc;
+        for s in samples.iter_mut() {
+            *s *= invacc;
         }
         samples
     }
@@ -110,8 +110,7 @@ where StandardNormal: Distribution<N>, Exp1: Distribution<N>, Open01: Distributi
 
 #[cfg(test)]
 mod test {
-    use super::Dirichlet;
-    use crate::Distribution;
+    use super::*;
 
     #[test]
     fn test_dirichlet() {
@@ -153,5 +152,15 @@ mod test {
     #[should_panic]
     fn test_dirichlet_invalid_alpha() {
         Dirichlet::new_with_size(0.0f64, 2).unwrap();
+    }
+    
+    #[test]
+    fn value_stability() {
+        let mut rng = crate::test::rng(223);
+        assert_eq!(rng.sample(Dirichlet::new(vec![1.0, 2.0, 3.0]).unwrap()),
+                vec![0.12941567177708177, 0.4702121891675036, 0.4003721390554146]);
+        assert_eq!(rng.sample(Dirichlet::new_with_size(8.0, 5).unwrap()),
+                vec![0.17684200044809556, 0.29915953935953055,
+                    0.1832858056608014, 0.1425623503573967, 0.19815030417417595]);
     }
 }
