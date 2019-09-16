@@ -65,6 +65,7 @@ fn f64_to_i64(x: f64) -> i64 {
 }
 
 impl Distribution<u64> for Binomial {
+    #[allow(clippy::many_single_char_names)]  // Same names as in the reference.
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> u64 {
         // Handle these values directly.
         if self.p == 0.0 {
@@ -324,5 +325,23 @@ mod test {
     #[should_panic]
     fn test_binomial_invalid_lambda_neg() {
         Binomial::new(20, -10.0).unwrap();
+    }
+    
+    #[test]
+    fn value_stability() {
+        fn test_samples(n: u64, p: f64, expected: &[u64]) {
+            let distr = Binomial::new(n, p).unwrap();
+            let mut rng = crate::test::rng(353);
+            let mut buf = [0; 4];
+            for x in &mut buf {
+                *x = rng.sample(&distr);
+            }
+            assert_eq!(buf, expected);
+        }
+        
+        // We have multiple code paths: np < 10, p > 0.5
+        test_samples(2, 0.7, &[1, 1, 2, 1]);
+        test_samples(20, 0.3, &[7, 7, 5, 7]);
+        test_samples(2000, 0.6, &[1194, 1208, 1192, 1210]);
     }
 }
