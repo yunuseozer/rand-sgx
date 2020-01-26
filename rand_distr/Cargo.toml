@@ -18,8 +18,13 @@ edition = "2018"
 travis-ci = { repository = "rust-random/rand" }
 appveyor = { repository = "rust-random/rand" }
 
+[features]
+default = ["mesalock_sgx"]
+mesalock_sgx = ["sgx_tstd"]
+
 [dependencies]
 rand = { path = "..", version = "0.7" }
+sgx_tstd = { version = "1.0", rev = "v1.1.0", git = "https://github.com/apache/teaclave-sgx-sdk.git", optional = true }
 
 [dev-dependencies]
 rand_pcg = { version = "0.2", path = "../rand_pcg" }

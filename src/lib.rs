@@ -56,7 +56,24 @@
     clippy::float_cmp
 )]
 
-#[cfg(all(feature = "alloc", not(feature = "std")))] extern crate alloc;
+#![cfg_attr(any(not(feature="std"),
+            all(feature = "mesalock_sgx", not(target_env = "sgx"))),
+             no_std)]
+#![cfg_attr(all(feature="alloc", not(feature="std")), feature(alloc))]
+
+#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
+
+#![allow(clippy::excessive_precision, clippy::unreadable_literal, clippy::float_cmp)]
+
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+#[macro_use]
+extern crate sgx_tstd as std;
+
+#[cfg(any(all(feature="std", not(feature="mesalock_sgx")),
+          target_env = "sgx"))]
+extern crate core;
+
+#[cfg(all(feature="alloc", not(feature="std")))] extern crate alloc;
 
 #[allow(unused)]
 macro_rules! trace { ($($x:tt)*) => (

@@ -9,6 +9,9 @@
 
 //! The dirichlet distribution.
 
+#[cfg(all(feature="mesalock_sgx", not(target_env="sgx")))]
+use std::prelude::v1::*;
+
 use crate::utils::Float;
 use crate::{Distribution, Exp1, Gamma, Open01, StandardNormal};
 use rand::Rng;

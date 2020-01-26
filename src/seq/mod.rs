@@ -30,6 +30,7 @@
 #[cfg(feature = "alloc")] use core::ops::Index;
 
 #[cfg(all(feature = "alloc", not(feature = "std")))] use crate::alloc::vec::Vec;
+#[cfg(feature="mesalock_sgx")] use std::prelude::v1::*;
 
 #[cfg(feature = "alloc")]
 use crate::distributions::uniform::{SampleBorrow, SampleUniform};
