@@ -11,6 +11,8 @@
 #![allow(deprecated)]
 #![allow(clippy::all)]
 
+#[cfg(feature="mesalock_sgx")] use std::prelude::v1::*;
+
 use crate::distributions::gamma::Gamma;
 use crate::distributions::Distribution;
 use crate::Rng;

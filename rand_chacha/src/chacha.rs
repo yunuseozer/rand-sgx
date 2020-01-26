@@ -9,8 +9,12 @@
 //! The ChaCha random number generator.
 
 #[cfg(not(feature = "std"))] use core;
-#[cfg(feature = "std")] use std as core;
+#[cfg(all(feature = "std", feature = "mesalock_sgx", target_env = "sgx"))]
+use std as core;
 
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+use core::fmt;
+#[cfg(all(feature = "mesalock_sgx", target_env = "sgx"))]
 use self::core::fmt;
 use crate::guts::ChaCha;
 use rand_core::block::{BlockRng, BlockRngCore};
@@ -56,6 +60,7 @@ where T: Copy + Default
         new
     }
 }
+
 impl<T> fmt::Debug for Array64<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Array64 {{}}")

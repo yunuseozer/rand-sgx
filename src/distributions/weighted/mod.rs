@@ -27,6 +27,8 @@ use core::fmt;
 // Note that this whole module is only imported if feature="alloc" is enabled.
 #[cfg(not(feature = "std"))] use crate::alloc::vec::Vec;
 
+#[cfg(feature="mesalock_sgx")] use std::prelude::v1::*;
+
 /// A distribution using weighted sampling to pick a discretely selected
 /// item.
 ///

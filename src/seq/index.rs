@@ -13,6 +13,7 @@
 #[cfg(all(feature = "alloc", not(feature = "std")))]
 use crate::alloc::vec::{self, Vec};
 #[cfg(feature = "std")] use std::vec;
+#[cfg(feature="mesalock_sgx")] use std::prelude::v1::*;
 // BTreeMap is not as fast in tests, but better than nothing.
 #[cfg(all(feature = "alloc", not(feature = "std")))]
 use crate::alloc::collections::BTreeSet;

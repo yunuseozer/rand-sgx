@@ -36,8 +36,26 @@
 #![deny(missing_debug_implementations)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
 #![allow(clippy::unreadable_literal)]
+#![allow(unused_attributes)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#![cfg_attr(all(feature="alloc", not(feature="std")), feature(alloc))]
+#![cfg_attr(any(not(feature = "std"),
+                all(feature = "mesalock_sgx", not(target_env = "sgx"))),
+            no_std)]
+#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
+#![allow(clippy::unreadable_literal)]
+
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+#[macro_use]
+extern crate sgx_tstd as std;
+
+#[cfg(all(feature="mesalock_sgx", not(target_env="sgx")))]
+use std::prelude::v1::*;
+
+#[cfg(any(all(feature="std", not(feature="mesalock_sgx")),
+          target_env = "sgx"))]
+extern crate core;
 
 use core::convert::AsMut;
 use core::default::Default;
