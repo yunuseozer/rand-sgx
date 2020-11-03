@@ -63,7 +63,8 @@ sgx_tstd = { version = "1.0", rev = "v1.1.2", git = "https://github.com/apache/t
 
 [dependencies.packed_simd]
 # NOTE: so far no version works reliably due to dependence on unstable features
-version = "0.3"
+package = "packed_simd_2"
+version = "0.3.4"
 # git = "https://github.com/rust-lang-nursery/packed_simd"
 optional = true
 features = ["into_bits"]
