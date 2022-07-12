@@ -57,9 +57,9 @@ rand_pcg = { path = "rand_pcg", version = "0.2", optional = true }
 # Do not depend on 'getrandom_package' directly; use the 'getrandom' feature!
 # This is a dependency because: we forward wasm feature flags
 # This is renamed because: we need getrandom to depend on rand_core/getrandom
-getrandom_package = { git = "https://github.com/mesalock-linux/getrandom-sgx", package = "getrandom", optional = true }
-log = { git = "https://github.com/mesalock-linux/log-sgx", optional = true }
-sgx_tstd = { version = "1.0", rev = "v1.1.3", git = "https://github.com/apache/teaclave-sgx-sdk.git", optional = true }
+getrandom_package = { git = "https://github.com/yunuseozer/getrandom-sgx", package = "getrandom", optional = true , rev = "sgx_1.1.4"}
+log = { git = "https://github.com/yunuseozer/log-sgx", optional = true }
+sgx_tstd = { version = "1.0", rev = "v1.1.4-upgrade", git = "https://github.com/yunuseozer/incubator-teaclave-sgx-sdk.git", optional = true }
 
 [dependencies.packed_simd]
 # NOTE: so far no version works reliably due to dependence on unstable features
